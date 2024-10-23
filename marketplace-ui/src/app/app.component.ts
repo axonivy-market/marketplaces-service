@@ -3,7 +3,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { LoadingService } from './core/services/loading/loading.service';
 import { RoutingQueryParamService } from './shared/services/routing.query.param.service';
 import { CommonModule } from '@angular/common';
-import { ERROR_PAGE_PATH } from './shared/constants/common.constant';
+import { DESIGNER_COOKIE_VARIABLE, ERROR_PAGE_PATH } from './shared/constants/common.constant';
 import { Component, inject } from '@angular/core';
 import {
   ActivatedRoute,
@@ -36,13 +36,13 @@ export class AppComponent {
       }
     });
 
-    this.routingQueryParamService.getNavigationStartEvent().subscribe(() => {
-      if (!this.routingQueryParamService.isDesignerEnv()) {
-        this.route.queryParams.subscribe(params => {
-          this.routingQueryParamService.checkCookieForDesignerEnv(params);
-          this.routingQueryParamService.checkCookieForDesignerVersion(params);
-        });
-      }
-    });
+    // this.routingQueryParamService.getNavigationStartEvent().subscribe(() => {
+    //   if (!this.routingQueryParamService.isDesignerEnv()) {
+    //     this.route.queryParams.subscribe(params => {
+    //       this.routingQueryParamService.checkCookieForDesignerEnv(params);
+    //       this.routingQueryParamService.checkCookieForDesignerVersion(params);
+    //     });
+    //   }
+    // });
   }
 }

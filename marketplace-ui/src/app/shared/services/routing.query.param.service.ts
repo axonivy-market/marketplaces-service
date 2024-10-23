@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { DESIGNER_COOKIE_VARIABLE } from '../constants/common.constant';
-import { Router, Params, NavigationStart } from '@angular/router';
+import { Router, Params, NavigationStart, Route, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 @Injectable({
@@ -14,7 +14,8 @@ export class RoutingQueryParamService {
 
   constructor(
     private readonly cookieService: CookieService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {
     this.getNavigationStartEvent().subscribe(() => {
       if (!this.isDesigner()) {
@@ -23,18 +24,42 @@ export class RoutingQueryParamService {
             DESIGNER_COOKIE_VARIABLE.ivyViewerParamName
           ) === DESIGNER_COOKIE_VARIABLE.defaultDesignerViewer
         );
+
+        this.route.queryParams.subscribe(params => {
+          this.checkCookieForDesignerEnv(params);
+          this.checkCookieForDesignerVersion(params);
+        });
       }
     });
   }
 
   checkCookieForDesignerVersion(params: Params) {
     const versionParam = params[DESIGNER_COOKIE_VARIABLE.ivyVersionParamName];
+    // console.log(versionParam);
+
+    // if (versionParam !== undefined) {
+    //   this.cookieService.set(
+    //     DESIGNER_COOKIE_VARIABLE.ivyVersionParamName,
+    //     versionParam
+    //   );
+    //   this.designerVersion.set(versionParam);
+    // }
+
     if (versionParam !== undefined) {
-      this.cookieService.set(
-        DESIGNER_COOKIE_VARIABLE.ivyVersionParamName,
-        versionParam
-      );
-      this.designerVersion.set(versionParam);
+      if (Array.isArray(versionParam)) {
+        let versionParamSet = Array.from(new Set(versionParam));
+        this.cookieService.set(
+          DESIGNER_COOKIE_VARIABLE.ivyVersionParamName,
+          versionParamSet[0]
+        );
+        this.designerVersion.set(versionParamSet[0]);
+      } else {
+        this.cookieService.set(
+          DESIGNER_COOKIE_VARIABLE.ivyVersionParamName,
+          versionParam
+        );
+        this.designerVersion.set(versionParam);
+      }
     }
   }
 

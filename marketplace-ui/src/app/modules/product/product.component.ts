@@ -75,17 +75,57 @@ export class ProductComponent implements AfterViewInit, OnDestroy {
   languageService = inject(LanguageService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  extraSearchQueryString = '';
   @ViewChild('observer', { static: true }) observerElement!: ElementRef;
 
   constructor() {
+    // this.route.queryParams.subscribe(params => {
+    //   console.log(params);
+
+    //   this.isRESTClient.set(
+    //     DESIGNER_COOKIE_VARIABLE.restClientParamName in params &&
+    //       this.isDesignerEnvironment
+    //   );
+
+    //   if (params[DESIGNER_COOKIE_VARIABLE.searchParamName] != null) {
+    //     // this.criteria.search = params[DESIGNER_COOKIE_VARIABLE.searchParamName];
+
+    //     this.criteria.search = params[DESIGNER_COOKIE_VARIABLE.searchParamName].replace("?ivy-viewer=designer-market", "");
+    //   }
+    // });
+
+    // this.loadProductItems();
+    // this.subscriptions.push(
+    //   this.searchTextChanged
+    //     .pipe(debounceTime(SEARCH_DEBOUNCE_TIME))
+    //     .subscribe(value => {
+    //       this.criteria = {
+    //         ...this.criteria,
+    //         nextPageHref: '',
+    //         search: value
+    //       };
+    //       this.loadProductItems(true);
+    //     })
+    // );
+    // this.router.events?.subscribe(event => {
+    //   if (!(event instanceof NavigationStart)) {
+    //     return;
+    //   }
+    //   window.scrollTo(0, 0);
+    // });
+  }
+
+  ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.isRESTClient.set(
         DESIGNER_COOKIE_VARIABLE.restClientParamName in params &&
           this.isDesignerEnvironment
       );
 
-      if (params[DESIGNER_COOKIE_VARIABLE.searchParamName] != null) {
-        this.criteria.search = params[DESIGNER_COOKIE_VARIABLE.searchParamName];
+
+      if (params[DESIGNER_COOKIE_VARIABLE.searchParamName] != null) {        
+        this.extraSearchQueryString = DESIGNER_COOKIE_VARIABLE.ivyViewerParamName + "=" +params[DESIGNER_COOKIE_VARIABLE.ivyViewerParamName];  
+        this.criteria.search = params[DESIGNER_COOKIE_VARIABLE.searchParamName].replace("?" + this.extraSearchQueryString, "");
       }
     });
 
