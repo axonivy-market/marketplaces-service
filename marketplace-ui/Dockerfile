@@ -1,6 +1,7 @@
 # Stage 1: Build Angular app
 FROM node:20-alpine AS build-angular
 ARG BUILD_ENV, GITHUB_CLIENT_ID
+ENV GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
 WORKDIR /app
 COPY . .
 # Replace the placeholder in the environment file during build
