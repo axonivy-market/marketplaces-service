@@ -122,5 +122,11 @@ jobs:
             BUILD_VERSION=$(xml sel -t -v "//_:project/_:version" ../marketplace-service/pom.xml)
           fi
 
-          docker compose build --build-arg BUILD_ENV=${{ inputs.build_env }} --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg GITHUB_CLIENT_ID=${{ secrets.OAUTH_APP_CLIENT_ID }}
+          if [ "${{ inputs.build_env }}" == "production" ]; then
+            OAUTH_APP_CLIENT_ID=${{ secrets.OAUTH_APP_CLIENT_ID }}
+          else
+            OAUTH_APP_CLIENT_ID=${{ secrets.OAUTH_APP_CLIENT_ID_STAGING }}
+          fi
+
+          docker compose build --build-arg BUILD_ENV=${{ inputs.build_env }} --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg GITHUB_CLIENT_ID=$OAUTH_APP_CLIENT_ID
           docker compose up --force-recreate -d
