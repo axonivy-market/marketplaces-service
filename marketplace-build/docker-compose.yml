@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
       args:
         - BUILD_ENV=${BUILD_ENV}
+        - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
     restart: always
     volumes:
       - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf

@@ -1,8 +1,10 @@
 # Stage 1: Build Angular app
 FROM node:20-alpine AS build-angular
-ARG BUILD_ENV
+ARG BUILD_ENV, GITHUB_CLIENT_ID
 WORKDIR /app
 COPY . .
+# Replace the placeholder in the environment file during build
+RUN sed -i "s|GITHUB_CLIENT_ID|${GITHUB_CLIENT_ID}|g" src/environments/environment.staging.ts
 RUN npm install
 RUN npm run build -- --configuration $BUILD_ENV
 
