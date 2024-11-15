@@ -128,5 +128,5 @@ jobs:
             OAUTH_APP_CLIENT_ID=${{ secrets.OAUTH_APP_CLIENT_ID_STAGING }}
           fi
           echo $OAUTH_APP_CLIENT_ID
-          docker compose build --build-arg BUILD_ENV=${{ inputs.build_env }} --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg GITHUB_CLIENT_ID=$OAUTH_APP_CLIENT_ID
+          docker compose build --build-arg BUILD_ENV=${{ inputs.build_env }} --build-arg GITHUB_CLIENT_ID=$OAUTH_APP_CLIENT_ID --build-arg BUILD_VERSION=$BUILD_VERSION
           docker compose up --force-recreate -d
