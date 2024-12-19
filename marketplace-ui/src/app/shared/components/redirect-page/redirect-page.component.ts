@@ -37,7 +37,7 @@ export class RedirectPageComponent implements OnInit {
         this.fetchLatestLibVersionDownloadUrl(product, version, artifact);
         return;
       }
-      this.fetchDocumentUrl(product, version, currentUrl);
+      // this.fetchDocumentUrl(product, version, currentUrl);
     }
   }
 

@@ -1,3 +1,4 @@
+import MarkdownIt from 'markdown-it';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
   Component,
@@ -51,6 +52,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { ROUTER } from '../../../shared/constants/router.constant';
 import { Title } from '@angular/platform-browser';
 import { API_URI } from '../../../shared/constants/api.constant';
+import MarkdownItGitHubAlerts from 'markdown-it-github-alerts';
 
 export interface DetailTab {
   activeClass: string;
@@ -140,6 +142,7 @@ export class ProductDetailComponent {
   }
 
   ngOnInit(): void {
+    this.renderGithubAlerts();
     this.router.navigate([], {
       relativeTo: this.route,
       queryParamsHandling: 'merge',
@@ -416,5 +419,17 @@ export class ProductDetailComponent {
     }
 
     return productDetail;
+  }
+
+  renderGithubAlerts(): string {
+    // const html = md.render(this.getProductModuleContentValue(displayedTab))
+
+    const md = MarkdownIt();
+    md.use(MarkdownItGitHubAlerts, /* Options */)
+
+    const result = md.render('> [!NOTE] > Highlights information that users should take into account, even when skimming.');
+    console.log(result);
+    
+    return result;
   }
 }

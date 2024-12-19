@@ -1,6 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Language } from '../enums/language.enum';
 import { DisplayValue } from '../models/display-value.model';
+import MarkdownIt from 'markdown-it';
+// import MarkdownItGitHubAlerts from 'markdown-it-github-alerts/index';
 
 @Pipe({
   standalone: true,
@@ -16,5 +18,15 @@ export class MultilingualismPipe implements PipeTransform {
       }
     }
     return displayValue;
+    // return this.renderGithubAlerts(displayValue);
   }
+
+  // public renderGithubAlerts(value: string) {
+  //   const md = MarkdownIt()
+
+  //   md.use(MarkdownItGitHubAlerts, /* Options */)
+
+  //   const html = md.render(value)
+  //   return html;
+  // }
 }
