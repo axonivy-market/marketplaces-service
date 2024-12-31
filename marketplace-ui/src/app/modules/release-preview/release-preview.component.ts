@@ -26,6 +26,7 @@ import { DisplayValue } from '../../shared/models/display-value.model';
 import { MultilingualismPipe } from '../../shared/pipes/multilingualism.pipe';
 
 const DEFAULT_ACTIVE_TAB = 'description';
+const MAX_FILE_SIZE_MB = 20;
 @Component({
   selector: 'app-release-preview',
   standalone: true,
@@ -85,7 +86,7 @@ export class ReleasePreviewComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      const maxFileSize = 20 * 1024 * 1024;
+      const maxFileSize = MAX_FILE_SIZE_MB * 1024 * 1024;
       this.selectedFile = file;
 
       // Check if the selected file is a ZIP file
