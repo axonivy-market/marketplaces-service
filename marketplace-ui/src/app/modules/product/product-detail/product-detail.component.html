@@ -128,6 +128,23 @@
                     </a>
                   </li>
                 }
+                <!-- <li
+                  ngbNavItem
+                  class="nav-item d-flex flex-row position-relative border-bottom-1 p-2 justify-content-center align-items-start">
+                  <a
+                    [lang]="languageService.selectedLanguage()"
+                    ngbNavLink
+                    class="nav-link tab-title border-0 bg-transparent"
+                    id="changelog"
+                    (click)="setActiveTab('changelog')"
+                    role="tab"
+                    [ngClass]="{
+                      'text-secondary': themeService.isDarkMode(),
+                      'text-dark': !themeService.isDarkMode()
+                    }">
+                      Changelog
+                  </a>
+                </li> -->
               </ul>
             </div>
             <!-- For smaller screens -->
@@ -173,9 +190,10 @@
                 </div>
               </div>
             </div>
-            <div class="tab-content col-12 default-cursor">
+            <div #tabContent class="tab-content col-12 default-cursor">
               @for (displayedTab of displayedTabsSignal(); track $index) {
                 <div
+                  
                   class="tab-pane fade show"
                   [class.active]="activeTab === displayedTab.value"
                   [id]="displayedTab.value"
@@ -187,7 +205,21 @@
                       [selectedVersion]="
                         selectedVersion
                       "></app-product-detail-maven-content>
-                  } @else {
+                  } @else if (displayedTab.value === 'changelog') {
+                    @for (productReleaseSafeHtml of productReleaseSafeHtmls; track $index) {
+                      <div #changelogContainer class="changelog-container mb-5 p-4">
+                        <div class="release-version mb-3 d-flex">
+                          <h1 class="me-4">{{productReleaseSafeHtml.name}}</h1>
+                          @if ($index == 0) {
+                            <h5 class="latest-release px-3 py-2">Latest</h5>
+                          }
+                        </div>
+                        <h5 class="release-published-date mb-5">{{productReleaseSafeHtml.publishedAt | date: "MMM dd, yyyy"}}</h5>
+                        <div class="changelog-content" [innerHtml]="productReleaseSafeHtml.body"></div>
+                      </div>
+                    }
+                  }
+                  @else {
                     <div class="readme-content" [innerHtml]="renderGithubAlert(getProductModuleContentValue(displayedTab)
                           | multilingualism: languageService.selectedLanguage())"></div>
                   }

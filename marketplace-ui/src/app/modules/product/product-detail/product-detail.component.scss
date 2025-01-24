@@ -60,6 +60,95 @@
   }
 }
 
+.changelog-container ::ng-deep {
+  a {
+    color: var(--ivy-primary-bg);
+  }
+  
+  border: solid 1px gray;
+  border-radius: 1rem;
+
+  .changelog-content h2 {
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: solid 1px var(--ivy-text-secondary-color);
+  }
+
+  .release-published-date {
+    color: var(--ivy-text-secondary-color);
+  }
+
+  .latest-release {
+    color: var(--product-latest-release);
+    border: 1px solid var(--product-latest-release-border);
+    border-radius: 3rem;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  h5 {
+    font-size: 1.2rem;
+  }
+
+  p,
+  ul, li {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ivy-text-primary-color);
+  }
+
+  ul, li {
+    margin: 25.2px 0;
+  }
+
+  a {
+    word-break: break-all;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow-x: auto;
+    display: block;
+
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+      word-wrap: break-word;
+      white-space: normal;
+      font-size: 12px;
+    }
+
+    tr {
+      border-bottom: 1px solid var(--ivy-border-color);
+    }
+  }
+
+  pre code {
+    font-size: 1.4rem;
+  }
+}
+
 .readme-content ::ng-deep {
   h1 {
     font-size: 24px;

@@ -7,13 +7,15 @@ import { SortOption } from '../../shared/enums/sort-option.enum';
 import { TypeOption } from '../../shared/enums/type-option.enum';
 import {
   MOCK_PRODUCTS,
-  MOCK_PRODUCT_DETAIL
+  MOCK_PRODUCT_DETAIL,
+  MOCK_PRODUCT_RELEASES
 } from '../../shared/mocks/mock-data';
 import { Criteria } from '../../shared/models/criteria.model';
 import { VersionData } from '../../shared/models/vesion-artifact.model';
 import { ProductService } from './product.service';
 import { DEFAULT_PAGEABLE, DEFAULT_PAGEABLE_IN_REST_CLIENT } from '../../shared/constants/common.constant';
 import { API_URI } from '../../shared/constants/api.constant';
+import { ProductRelease } from '../../shared/models/apis/product-release.mode';
 
 describe('ProductService', () => {
   let products = MOCK_PRODUCTS._embedded.products;
@@ -228,18 +230,35 @@ describe('ProductService', () => {
 
     const req = httpMock.expectOne(`${API_URI.PRODUCT_DETAILS}/${productId}/designerversions`);
     expect(req.request.method).toBe('GET');
-    req.flush([{ version: '10.0.2' }, {version: '10.0.1'}, {version: '10.0.0'}]);
+    req.flush([{ version: '10.0.2' }, { version: '10.0.1' }, { version: '10.0.0' }]);
   });
 
-    it('getLatestArtifactDownloadUrl', () => {
-      const productId = 'bpmn-statistic';
-      const version = 'dev';
-      const artifact = 'bpmn-statistic.zip';
+  it('getLatestArtifactDownloadUrl', () => {
+    const productId = 'bpmn-statistic';
+    const version = 'dev';
+    const artifact = 'bpmn-statistic.zip';
 
-      service.getLatestArtifactDownloadUrl(productId, version, artifact).subscribe(response => {
-        expect(response).toBe(
-          'https://maven.axonivy.com/com/axonivy/utils/bpmn-statistic/10.0.20/bpmn-statistic.zip'
-        );
-      });
+    service.getLatestArtifactDownloadUrl(productId, version, artifact).subscribe(response => {
+      expect(response).toBe(
+        'https://maven.axonivy.com/com/axonivy/utils/bpmn-statistic/10.0.20/bpmn-statistic.zip'
+      );
     });
+  });
+
+  it('getProductChangelogs', () => {
+    const productId = 'portal';
+    const mockResponse: ProductRelease[] = MOCK_PRODUCT_RELEASES;
+
+    service.getProductChangelogs(productId).subscribe(response => {
+      expect(response.length).toEqual(mockResponse.length);
+    });
+
+    const req = httpMock.expectOne(`${API_URI.PRODUCT_DETAILS}/${productId}/releases`);
+    expect(req.request.method).toBe('GET');
+    req.flush([{
+      name: "12.0.3",
+      body: "## Changes\r\n\r\n## 🚀 Features\r\n\r\n- [IVYPORTAL-18158](https://1ivy.atlassian.net/browse/IVYPORTAL-18158) Implement File Preview to Portal Components https://github.com/nhthinh-axonivy (https://github.com/axonivy-market/portal/pull/1443)\r\n",
+      publishedAt: "2025-01-20"
+    }]);
+  });
 });

@@ -20,7 +20,7 @@ import {
   MOCK_CRON_JOB_PRODUCT_DETAIL,
   MOCK_PRODUCT_MODULE_CONTENT,
   MOCK_PRODUCTS,
-  MOCK_FEEDBACK_API_RESPONSE
+  MOCK_FEEDBACK_API_RESPONSE,
 } from '../../../shared/mocks/mock-data';
 import { ProductService } from '../product.service';
 import { ProductDetailComponent } from './product-detail.component';
@@ -38,6 +38,7 @@ import { ProductStarRatingService } from './product-detail-feedback/product-star
 import { FeedbackApiResponse } from '../../../shared/models/apis/feedback-response.model';
 import { StarRatingCounting } from '../../../shared/models/star-rating-counting.model';
 import { Feedback } from '../../../shared/models/feedback.model';
+import MarkdownIt from 'markdown-it';
 
 const products = MOCK_PRODUCTS._embedded.products;
 declare const viewport: Viewport;
@@ -53,6 +54,7 @@ describe('ProductDetailComponent', () => {
   let mockProductStarRatingService: jasmine.SpyObj<ProductStarRatingService>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockAppModalService: jasmine.SpyObj<AppModalService>;
+  const sourceURL = 'https://github.com/source-repo';
 
   beforeEach(async () => {
     const spy = jasmine.createSpyObj('DomSanitizer', [
@@ -164,6 +166,7 @@ describe('ProductDetailComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProductDetailComponent);
     component = fixture.componentInstance;
+
     fixture.detectChanges();
   });
 
@@ -611,6 +614,17 @@ describe('ProductDetailComponent', () => {
     expect(component.getContent('demo')).toBeFalse();
   });
 
+  it('should return false for changelog when productReleaseSafeHtmls is empty', () => {
+    const mockContent: ProductModuleContent = {
+      ...MOCK_PRODUCT_MODULE_CONTENT,
+    };
+
+    component.productReleaseSafeHtmls = [];
+
+    component.productModuleContent.set(mockContent);
+    expect(component.getContent('changelog')).toBeFalse();
+  });
+
   it('should display dropdown horizontally on small viewport', () => {
     viewport.set(540);
     const tabGroup = fixture.debugElement.query(By.css('.row-tab'));
@@ -766,11 +780,12 @@ describe('ProductDetailComponent', () => {
     );
   });
 
-  it('displayed tabs array should have size 0 if product module content description, setup, demo, dependcy are all empty', () => {
+  it('displayed tabs array should have size 0 if product module content description, setup, demo, dependency, and changelog are all empty', () => {
     const mockContent: ProductModuleContent = {
       ...MOCK_PRODUCT_MODULE_CONTENT
     };
     component.productModuleContent.set(mockContent);
+    component.productReleaseSafeHtmls = [];
 
     expect(component.displayedTabsSignal().length).toBe(0);
   });
@@ -862,5 +877,46 @@ describe('ProductDetailComponent', () => {
     fixture.detectChanges();
 
     expect(component.isDropdownOpen()).toBeFalse();
+  });
+
+  it('should replace GitHub URLs with appropriate links in linkifyPullRequests', () => {
+    const md = new MarkdownIt();
+    const sourceUrl = 'https://github.com/source-repo';
+    component.linkifyPullRequests(md, sourceUrl);
+
+    const inputText = 'Check out this PR: https://github.com/source-repo/pull/123';
+    const expectedOutput = 'Check out this PR: #123';
+    const result = md.renderInline(inputText);
+
+    expect(result).toContain(expectedOutput);
+  });
+
+  it('should keep GitHub URLs if they contain compare string in linkifyPullRequests', () => {
+    const md = new MarkdownIt();
+    const sourceUrl = 'https://github.com/source-repo';
+    component.linkifyPullRequests(md, sourceUrl);
+
+    const inputText = 'Check out this PR: https://github.com/source-repo/compare/123';
+    const expectedOutput = 'Check out this PR: https://github.com/source-repo/compare/123';
+    const result = md.renderInline(inputText);
+
+    expect(result).toContain(expectedOutput);
+  });
+
+
+  it('should render changelog content with safe HTML', () => {
+    const mockReleases = [
+      {
+        name: '1.0.0',
+        body: 'Initial release',
+        publishedAt: '2023-01-01',
+      },
+    ];
+    const expectedSafeHtml = '<p>Initial release</p>';
+    sanitizerSpy.bypassSecurityTrustHtml.and.returnValue(expectedSafeHtml);
+
+    const result = component.renderChangelogContent(mockReleases);
+
+    expect(result[0].body).toBe(expectedSafeHtml);
   });
 });

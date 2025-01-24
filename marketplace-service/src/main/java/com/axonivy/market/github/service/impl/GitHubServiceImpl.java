@@ -2,6 +2,7 @@ package com.axonivy.market.github.service.impl;
 
 import com.axonivy.market.constants.ErrorMessageConstants;
 import com.axonivy.market.constants.GitHubConstants;
+import com.axonivy.market.entity.Product;
 import com.axonivy.market.entity.User;
 import com.axonivy.market.enums.ErrorCode;
 import com.axonivy.market.exceptions.model.MissingHeaderException;
@@ -15,6 +16,7 @@ import com.axonivy.market.github.model.GitHubProperty;
 import com.axonivy.market.github.model.SecretScanning;
 import com.axonivy.market.github.service.GitHubService;
 import com.axonivy.market.github.model.ProductSecurityInfo;
+import com.axonivy.market.model.GithubReleaseModel;
 import com.axonivy.market.repository.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.kohsuke.github.*;
@@ -35,6 +37,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,6 +49,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -56,6 +63,10 @@ public class GitHubServiceImpl implements GitHubService {
   private final UserRepository userRepository;
   private final GitHubProperty gitHubProperty;
   private final ThreadPoolTaskScheduler taskScheduler;
+  private static final String GITHUB_PULL_REQUEST_NUMBER_REGEX = "#(\\d+)";
+  private static final String GITHUB_PULL_REQUEST_LINK = "/pull/";
+  private static final String GITHUB_USERNAME_REGEX = "@([a-zA-Z0-9\\-]+)";
+  private static final String GITHUB_MAIN_LINK = "https://github.com/";
 
   public GitHubServiceImpl(RestTemplate restTemplate, UserRepository userRepository,
       GitHubProperty gitHubProperty, ThreadPoolTaskScheduler taskScheduler) {
@@ -335,5 +346,39 @@ public class GitHubServiceImpl implements GitHubService {
 
     return restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {
     });
+  }
+
+  @Override
+  public List<GithubReleaseModel> getReleases(Product product) throws IOException {
+    List<GHRelease> ghReleases =
+        this.getRepository(product.getRepositoryName()).listReleases().toList().stream().filter(
+            ghRelease -> !ghRelease.isDraft()).toList();
+    List<GithubReleaseModel> githubReleaseModels = new ArrayList<>();
+
+    if (ghReleases.isEmpty()) {
+      return null;
+    }
+
+    for (GHRelease ghRelease : ghReleases) {
+      GithubReleaseModel githubReleaseModel = new GithubReleaseModel();
+      LocalDate localDate = ghRelease.getPublished_at().toInstant()
+          .atZone(ZoneId.systemDefault())
+          .toLocalDate();
+
+      String modifiedBody = transformGithubReleaseBody(ghRelease.getBody(), product.getSourceUrl());
+
+      githubReleaseModel.setBody(modifiedBody);
+      githubReleaseModel.setName(ghRelease.getName());
+      githubReleaseModel.setPublishedAt(localDate);
+
+      githubReleaseModels.add(githubReleaseModel);
+    }
+
+    return githubReleaseModels;
+  }
+
+  public String transformGithubReleaseBody(String githubReleaseBody, String productSourceUrl) {
+    return githubReleaseBody.replaceAll(GITHUB_PULL_REQUEST_NUMBER_REGEX,
+        productSourceUrl + GITHUB_PULL_REQUEST_LINK + "$1").replaceAll(GITHUB_USERNAME_REGEX, GITHUB_MAIN_LINK + "$1");
   }
 }

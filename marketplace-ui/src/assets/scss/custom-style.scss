@@ -16,6 +16,8 @@ $ivySecondaryButtonHoverLight: #ebebeb;
 $ivyPrimaryTextColorLight: #1b1b1b;
 $ivySecondaryTextLight: #4a4a4a;
 $ivyNormalTextColorLight: #fafafa;
+$ivyLatestReleaseBorderColor: #238636;
+$ivyLatestReleaseColor: #3fb950;
 
 // Dark
 $ivyPrimaryColorDark: 44, 44, 44;
@@ -25,6 +27,8 @@ $ivySecondaryColorDark: #383838;
 $ivySecondaryHoverDark: #202020;
 $ivyPrimaryButtonHoverDark: #ececec;
 $ivySecondaryTextDark: #a3a3a3;
+$ivyLatestReleaseColor: #3fb950;
+$ivyLatestReleaseBorderColor: #238636;
 
 h1 {
   font-weight: 600;
@@ -88,6 +92,10 @@ p {
   --text-error-oops-color: #{$ivyPrimaryTextColorLight};
   --product-feedback-container-bg-color: #{$ivySecondaryColorLight};
   --product-feedback-container-border-color: #{var(--header-border-color)};
+
+  
+  --product-latest-release: #{$ivyLatestReleaseColor};
+  --product-latest-release-border: #{$ivyLatestReleaseBorderColor};
 
   .bg-primary {
     background-color: #{$ivyPrimaryColorLight} !important;
@@ -195,6 +203,9 @@ p {
   --text-error-oops-color: #ffffff;
   --product-feedback-container-bg-color: #{$ivySecondaryColorDark};
   --product-feedback-container-border-color: #{$ivySecondaryTextLight};
+
+  --product-latest-release: #{$ivyLatestReleaseColor};
+  --product-latest-release-border: #{$ivyLatestReleaseBorderColor};
 
   a {
     color: #{$white};

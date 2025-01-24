@@ -160,6 +160,12 @@ export const PRODUCT_DETAIL_TABS: ItemDropdown[] = [
     tabId: 'dependency-tab',
     value: 'dependency',
     label: 'common.product.detail.maven.label'
+  },
+  {
+    activeClass: "activeTab === 'changelog'",
+    tabId: 'changelog-tab',
+    value: 'changelog',
+    label: 'common.product.detail.changelog'
   }
 ];
 

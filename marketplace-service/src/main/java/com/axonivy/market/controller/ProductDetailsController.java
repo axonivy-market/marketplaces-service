@@ -1,6 +1,9 @@
 package com.axonivy.market.controller;
 
 import com.axonivy.market.assembler.ProductDetailModelAssembler;
+import com.axonivy.market.entity.Product;
+import com.axonivy.market.github.service.GitHubService;
+import com.axonivy.market.model.GithubReleaseModel;
 import com.axonivy.market.model.MavenArtifactVersionModel;
 import com.axonivy.market.model.ProductDetailModel;
 import com.axonivy.market.model.VersionAndUrlModel;
@@ -11,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.kohsuke.github.GHRelease;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +38,14 @@ public class ProductDetailsController {
   private final VersionService versionService;
   private final ProductService productService;
   private final ProductDetailModelAssembler detailModelAssembler;
+  private final GitHubService gitHubService;
 
   public ProductDetailsController(VersionService versionService, ProductService productService,
-      ProductDetailModelAssembler detailModelAssembler) {
+      ProductDetailModelAssembler detailModelAssembler, GitHubService gitHubService) {
     this.versionService = versionService;
     this.productService = productService;
     this.detailModelAssembler = detailModelAssembler;
+    this.gitHubService = gitHubService;
   }
 
   @GetMapping(BY_ID_AND_VERSION)
@@ -128,5 +135,19 @@ public class ProductDetailsController {
     String downloadUrl = versionService.getLatestVersionArtifactDownloadUrl(productId, version, artifactId);
     HttpStatusCode statusCode = StringUtils.isBlank(downloadUrl) ? HttpStatus.NOT_FOUND : HttpStatus.OK;
     return new ResponseEntity<>(downloadUrl, statusCode);
+  }
+
+  @GetMapping(PRODUCT_PUBLIC_RELEASES)
+  @Operation(summary = "Get the list of public releases changelog by its id",
+      description = "Return the list of public releases changelog and id")
+  public ResponseEntity<List<GithubReleaseModel>> getGithubPublicReleases(
+      @PathVariable(value = ID) @Parameter(in = ParameterIn.PATH, example = "demos-app") String productId) throws IOException {
+    Product product = productService.findProductById(productId);
+
+    List<GithubReleaseModel> githubReleaseModels =
+        gitHubService.getReleases(product);
+
+    return new ResponseEntity<>(githubReleaseModels,
+        HttpStatus.OK);
   }
 }

@@ -3,7 +3,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { RoutingQueryParamService } from './shared/services/routing.query.param.service';
 import { CommonModule } from '@angular/common';
 import { ERROR_PAGE_PATH } from './shared/constants/common.constant';
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject, Renderer2 } from '@angular/core';
 import {
   ActivatedRoute,
   NavigationError,
@@ -25,7 +25,7 @@ export class AppComponent {
   route = inject(ActivatedRoute);
   isMobileMenuCollapsed = true;
 
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router, private renderer: Renderer2, private elRef: ElementRef) {}
 
   ngOnInit(): void {
     this.router.events.subscribe((event: Event) => {

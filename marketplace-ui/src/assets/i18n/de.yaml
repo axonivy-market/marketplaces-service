@@ -138,6 +138,7 @@ common:
           label: Artefakt
       contactUs:
         label: Kontakt
+      changelog: Änderungsliste
   feedback:
     label: Rückmeldung
     successMessage: Ihr Feedback wurde erfolgreich übermittelt!

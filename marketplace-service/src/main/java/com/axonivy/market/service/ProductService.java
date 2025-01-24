@@ -22,4 +22,6 @@ public interface ProductService {
   boolean syncOneProduct(String productId, String marketItemPath, Boolean overrideMarketItemPath);
 
   boolean syncFirstPublishedDateOfAllProducts();
+
+  Product findProductById(String id);
 }

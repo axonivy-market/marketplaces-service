@@ -35,4 +35,5 @@ public class RequestMappingConstants {
   public static final String PRODUCT_MARKETPLACE_DATA = API + "/product-marketplace-data";
   public static final String SECURITY_MONITOR = API + "/security-monitor";
   public static final String RELEASE_PREVIEW = API + "/release-preview";
+  public static final String PRODUCT_PUBLIC_RELEASES = "/{id}/releases";
 }

@@ -142,6 +142,7 @@ common:
           label: Choose artifact
       contactUs:
         label: Contact us
+      changelog: Changelog
   feedback:
     label: Feedback
     successMessage: Your feedback has been successfully submitted!
