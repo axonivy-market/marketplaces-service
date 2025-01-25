@@ -66,7 +66,7 @@ describe('ProductComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [
-        ProductComponent, 
+        ProductComponent,
         TranslateModule.forRoot(),
         MatomoTestingModule.forRoot()
       ],
@@ -101,7 +101,7 @@ describe('ProductComponent', () => {
         }
       })
       .compileComponents();
-    
+
     location = TestBed.inject(Location);
     router = TestBed.inject(Router);
 
@@ -143,6 +143,21 @@ describe('ProductComponent', () => {
     });
   });
 
+  it('onFilterChange should update queryParams correctly', () => {
+    spyOn(component.router, 'navigate');
+    const filterOption: ItemDropdown<TypeOption> = {
+      value: TypeOption.CONNECTORS,
+      label: 'Connectors' };
+
+    component.onFilterChange(filterOption);
+
+    expect(component.router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: component.route,
+      queryParams: { type: TypeOption.CONNECTORS },
+      queryParamsHandling: 'merge'
+    });
+  });
+
   it('onSortChange should order products properly', () => {
     component.onSearchChanged('cur');
     component.onSortChange(SortOption.ALPHABETICALLY);
@@ -154,6 +169,34 @@ describe('ProductComponent', () => {
       ).toEqual(1);
     }
   });
+
+  it('onFilterChange should handle "All Types" correctly', () => {
+    spyOn(component.router, 'navigate');
+    const filterOption: ItemDropdown<TypeOption> = { value: TypeOption.All_TYPES, label: 'All Types' };
+
+    component.onFilterChange(filterOption);
+
+    expect(component.router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: component.route,
+      queryParams: { type: null },
+      queryParamsHandling: 'merge'
+    });
+  });
+
+  it('onSearchChanged should handle empty search string correctly', fakeAsync(() => {
+    const searchString = '';
+    spyOn(component.router, 'navigate');
+
+    component.onSearchChanged(searchString);
+    tick(500);
+
+    expect(component.criteria.search).toEqual(searchString);
+    expect(component.router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: component.route,
+      queryParams: { search: null },
+      queryParamsHandling: 'merge'
+    });
+  }));
 
   it('search should return match products name', fakeAsync(() => {
     const productName = 'amazon comprehend';
@@ -212,7 +255,7 @@ describe('ProductComponent', () => {
     component.route.queryParams = of({
       [DESIGNER_SESSION_STORAGE_VARIABLE.restClientParamName]: 'resultsOnly',
     });
-    
+
     routingQueryParamService.isDesignerEnv.and.returnValue(true);
     const fixtureTest = TestBed.createComponent(ProductComponent);
     component = fixtureTest.componentInstance;

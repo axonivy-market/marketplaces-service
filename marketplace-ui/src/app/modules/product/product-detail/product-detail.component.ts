@@ -218,7 +218,11 @@ export class ProductDetailComponent {
   }
 
   onClickingBackToHomepageButton(): void {
-    this.router.navigate([API_URI.APP]);
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate([API_URI.APP]);
+    }
   }
 
   onLogoError(): void {
