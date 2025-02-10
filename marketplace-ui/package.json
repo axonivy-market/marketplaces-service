@@ -26,6 +26,7 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "dompurify": "^3.2.4",
     "emoji-toolkit": "^9.0.0",
     "jwt-decode": "^4.0.0",
     "karma-viewport": "^1.0.9",

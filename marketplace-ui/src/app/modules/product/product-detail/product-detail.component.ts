@@ -62,6 +62,8 @@ import { ProductRelease } from '../../../shared/models/apis/product-release.mode
 import LinkifyIt from 'linkify-it';
 import { ProductReleaseSafeHtml } from '../../../shared/models/product-release-safe-html.model';
 
+import DOMPurify from 'dompurify';
+
 export interface DetailTab {
   activeClass: string;
   tabId: string;
@@ -472,13 +474,15 @@ export class ProductDetailComponent {
     return productDetail;
   }
 
-  renderGithubAlert(value: string): SafeHtml {    
+  renderGithubAlert(value: string): SafeHtml {
     const md = MarkdownIt();
     md.use(MarkdownItGitHubAlerts);
     md.use(full); // Add emoji support
     const result = md.render(value);
+    const clean = DOMPurify.sanitize(result);
+    return clean;
 
-    return this.sanitizer.bypassSecurityTrustHtml(result);
+    // return this.sanitizer.bypassSecurityTrustHtml(result);
   }
 
   renderChangelogContent(releases: ProductRelease[]): ProductReleaseSafeHtml[] {
