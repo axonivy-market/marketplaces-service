@@ -478,28 +478,24 @@ export class ProductDetailComponent {
     const md = MarkdownIt();
     md.use(MarkdownItGitHubAlerts);
     md.use(full); // Add emoji support
-    const result = md.render(value);
+    const result = md.render(value);    
     const clean = DOMPurify.sanitize(result);
-    return clean;
 
-    // return this.sanitizer.bypassSecurityTrustHtml(result);
+    return clean;
   }
 
   renderChangelogContent(releases: ProductRelease[]): ProductReleaseSafeHtml[] {
+    
     return releases.map(release => {
+      const clean = DOMPurify.sanitize(release.body);
+      
       return {
         name: release.name,
-        body: this.bypassSecurityTrustHtml(release.body),
+        body: this.md.render(clean),
         publishedAt: release.publishedAt,
       };
     });
   }
-
-  private bypassSecurityTrustHtml(value: string): SafeHtml {
-    const markdownContent = this.md.render(value);
-    return this.sanitizer.bypassSecurityTrustHtml(markdownContent);
-  }
-
 
   linkifyPullRequests(md: MarkdownIt, sourceUrl: string, prNumberRegex: RegExp) {
     md.renderer.rules.text = (tokens, idx) => {
