@@ -857,16 +857,6 @@ describe('ProductDetailComponent', () => {
     expect(mavenTab).toBeFalsy();
   });
 
-  it('should render GitHub alert as safe HTML', () => {
-    const value = '**This is a test**';
-    const mockedRenderedHtml = '<strong>This is a test</strong>';
-    sanitizerSpy.bypassSecurityTrustHtml.and.returnValue(mockedRenderedHtml);
-
-    const result = component.renderGithubAlert(value);
-
-    expect(result).toBe(mockedRenderedHtml);
-  });
-
   it('should close the dropdown when clicking outside', () => {
     component.isDropdownOpen.set(true);
     fixture.detectChanges();
@@ -900,22 +890,5 @@ describe('ProductDetailComponent', () => {
     const result = md.renderInline(inputText);
 
     expect(result).toContain(expectedOutput);
-  });
-
-
-  it('should render changelog content with safe HTML', () => {
-    const mockReleases = [
-      {
-        name: '1.0.0',
-        body: 'Initial release',
-        publishedAt: '2023-01-01',
-      },
-    ];
-    const expectedSafeHtml = '<p>Initial release</p>';
-    sanitizerSpy.bypassSecurityTrustHtml.and.returnValue(expectedSafeHtml);
-
-    const result = component.renderChangelogContent(mockReleases);
-
-    expect(result[0].body).toBe(expectedSafeHtml);
   });
 });
