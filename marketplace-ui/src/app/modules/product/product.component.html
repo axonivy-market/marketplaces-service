@@ -33,7 +33,7 @@
   @if (products().length > 0) {
   <div class="row product-container">
     @for (product of products(); track product.id) {
-    <div (click)="viewProductDetail(product.id, '')" class="product-card col-sm-12 col-md-6 col-lg-4 col-xxl-3 mt-2 mb-2">
+    <div (click)="viewProductDetail(product.id)" class="product-card col-sm-12 col-md-6 col-lg-4 col-xxl-3 mt-2 mb-2">
       <app-product-card [product]="product" [tabIndex]="product.id"></app-product-card>
     </div>
     }

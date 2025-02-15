@@ -61,6 +61,9 @@ import { LoadingService } from '../../../core/services/loading/loading.service';
 import { ProductRelease } from '../../../shared/models/apis/product-release.model';
 import LinkifyIt from 'linkify-it';
 import { ProductReleaseSafeHtml } from '../../../shared/models/product-release-safe-html.model';
+import { HistoryService } from '../../../core/services/history/history.service';
+import { TypeOption } from '../../../shared/enums/type-option.enum';
+import { SortOption } from '../../../shared/enums/sort-option.enum';
 
 export interface DetailTab {
   activeClass: string;
@@ -114,6 +117,7 @@ export class ProductDetailComponent {
   cookieService = inject(CookieService);
   routingQueryParamService = inject(RoutingQueryParamService);
   loadingService = inject(LoadingService);
+  historyService = inject(HistoryService);
 
   protected LoadingComponentId = LoadingComponentId;
   protected ProductDetailActionType = ProductDetailActionType;
@@ -241,11 +245,32 @@ export class ProductDetailComponent {
   }
 
   onClickingBackToHomepageButton(): void {
-    if (window.history.length > 1) {
-      window.history.back();
+    if (this.historyService.isLastSearchChanged()) {
+      this.navigateToHomePageWithLastSearch();
     } else {
       this.router.navigate([API_URI.APP]);
     }
+  }
+
+  navigateToHomePageWithLastSearch() {
+    const queryParams: Record<string, string | SortOption | TypeOption> = {};
+    if (this.historyService.lastSearchType() !== TypeOption.All_TYPES) {
+      queryParams['type'] = this.historyService.lastSearchType() as string;
+    }
+
+    if (this.historyService.lastSortOption() !== SortOption.STANDARD) {
+      queryParams['sort'] = this.historyService.lastSortOption();
+    }
+
+    if (this.historyService.lastSearchText() !== "") {
+      queryParams['search'] = this.historyService.lastSearchText() as string;
+    }
+
+    this.router.navigate([API_URI.APP], {
+      relativeTo: this.route,
+      queryParamsHandling: 'merge',
+      queryParams
+    });
   }
 
   onLogoError(): void {

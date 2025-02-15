@@ -37,7 +37,6 @@ import { ItemDropdown } from '../../shared/models/item-dropdown.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { LoadingService } from '../../core/services/loading/loading.service';
 import { LoadingComponentId } from '../../shared/enums/loading-component-id';
-
 const SEARCH_DEBOUNCE_TIME = 500;
 
 @Component({
@@ -74,7 +73,6 @@ export class ProductComponent implements AfterViewInit, OnDestroy {
   responsePage!: Page;
   isRESTClient: WritableSignal<boolean> = signal(false);
   isDesignerEnvironment = inject(RoutingQueryParamService).isDesignerEnv();
-
   productService = inject(ProductService);
   themeService = inject(ThemeService);
   translateService = inject(TranslateService);
@@ -133,7 +131,7 @@ export class ProductComponent implements AfterViewInit, OnDestroy {
     this.setupIntersectionObserver();
   }
 
-  viewProductDetail(productId: string, _productTag: string) {
+  viewProductDetail(productId: string) {
     if (this.isRESTClient()) {
       window.location.href = `/${productId}`;
     }
@@ -147,7 +145,6 @@ export class ProductComponent implements AfterViewInit, OnDestroy {
       type: selectedType.value
     };
     this.loadProductItems(true);
-
     let queryParams: { type: TypeOption | null } = { type: null };
 
     if (selectedType.value !== TypeOption.All_TYPES) {

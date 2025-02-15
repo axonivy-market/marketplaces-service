@@ -10,7 +10,7 @@ import {
   tick
 } from '@angular/core/testing';
 import { By, DomSanitizer, SafeHtml, Title } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { Viewport } from 'karma-viewport/dist/adapter/viewport';
 import { of } from 'rxjs';
@@ -41,6 +41,9 @@ import { Feedback } from '../../../shared/models/feedback.model';
 import MarkdownIt from 'markdown-it';
 import { PRODUCT_DETAIL_TABS } from '../../../shared/constants/common.constant';
 import { MultilingualismPipe } from '../../../shared/pipes/multilingualism.pipe';
+import { HistoryService } from '../../../core/services/history/history.service';
+import { SortOption } from '../../../shared/enums/sort-option.enum';
+import { API_URI } from '../../../shared/constants/api.constant';
 
 const products = MOCK_PRODUCTS._embedded.products;
 declare const viewport: Viewport;
@@ -56,6 +59,8 @@ describe('ProductDetailComponent', () => {
   let mockProductStarRatingService: jasmine.SpyObj<ProductStarRatingService>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockAppModalService: jasmine.SpyObj<AppModalService>;
+  let mockHistoryService: jasmine.SpyObj<HistoryService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
     const spy = jasmine.createSpyObj('DomSanitizer', [
@@ -71,6 +76,13 @@ describe('ProductDetailComponent', () => {
       'selectedLanguage'
     ]);
 
+    mockHistoryService = jasmine.createSpyObj('HistoryService', [
+      'lastSearchType',
+      'lastSortOption',
+      'lastSearchText',
+      'isLastSearchChanged'
+    ]);
+
     mockProductFeedbackService = jasmine.createSpyObj(
       'ProductFeedbackService',
       [
@@ -81,6 +93,9 @@ describe('ProductDetailComponent', () => {
         'totalElements'
       ]
     );
+
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
     mockAuthService = jasmine.createSpyObj('AuthService', ['getToken']);
     mockAppModalService = jasmine.createSpyObj('AppModalService', [
       'openAddFeedbackDialog'
@@ -122,6 +137,8 @@ describe('ProductDetailComponent', () => {
           provide: RoutingQueryParamService,
           useValue: routingQueryParamServiceSpy
         },
+        { provide: Router, useValue: mockRouter },
+        { provide: HistoryService, useValue: mockHistoryService },
         {
           provide: LanguageService,
           useValue: languageServiceSpy
@@ -955,4 +972,47 @@ describe('ProductDetailComponent', () => {
 
     expect(result[0].body).toBe(expectedSafeHtml);
   });
+
+  it('should navigate with correct query parameters when last recorded values differ from defaults', () => {
+    mockHistoryService.lastSearchType.and.returnValue(TypeOption.CONNECTORS);
+    mockHistoryService.lastSortOption.and.returnValue(SortOption.POPULARITY);
+    mockHistoryService.lastSearchText.and.returnValue('test-search');
+
+    component.navigateToHomePageWithLastSearch();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith([API_URI.APP], {
+      relativeTo: jasmine.anything(),
+      queryParamsHandling: 'merge',
+      queryParams: {
+        type: TypeOption.CONNECTORS,
+        sort: SortOption.POPULARITY,
+        search: 'test-search'
+      }
+    });
+  });
+
+  it('should navigate with empty query params when defaults are present', () => {
+    mockHistoryService.lastSearchType.and.returnValue(TypeOption.All_TYPES);
+    mockHistoryService.lastSortOption.and.returnValue(SortOption.STANDARD);
+    mockHistoryService.lastSearchText.and.returnValue('');
+
+    component.navigateToHomePageWithLastSearch();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith([API_URI.APP], {
+      relativeTo: jasmine.anything(),
+      queryParamsHandling: 'merge',
+      queryParams: {}
+    });
+  });
+
+  it('should navigate to home page when click back to button regardless history',() => {
+    mockHistoryService.lastSearchType.and.returnValue(TypeOption.All_TYPES);
+    mockHistoryService.lastSortOption.and.returnValue(SortOption.STANDARD);
+    mockHistoryService.lastSearchText.and.returnValue("");
+    component.setActiveTab("description");
+    component.setActiveTab("demo")
+    component.setActiveTab("setup")
+    component.onClickingBackToHomepageButton();
+    expect(mockRouter.navigate).toHaveBeenCalledWith([API_URI.APP]);
+  })
 });

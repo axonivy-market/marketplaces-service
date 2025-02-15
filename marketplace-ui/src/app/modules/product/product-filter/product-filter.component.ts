@@ -13,6 +13,7 @@ import { ItemDropdown } from '../../../shared/models/item-dropdown.model';
 import { MatomoAction, MatomoCategory, MatomoTracker } from '../../../shared/enums/matomo-tracking.enum';
 import { MATOMO_DIRECTIVES } from 'ngx-matomo-client';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HistoryService } from '../../../core/services/history/history.service';
 
 @Component({
   selector: 'app-product-filter',
@@ -41,6 +42,7 @@ export class ProductFilterComponent {
   languageService = inject(LanguageService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  historyService = inject(HistoryService);
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -57,6 +59,8 @@ export class ProductFilterComponent {
       } else {
         this.typeValue = type;
       }
+      this.historyService.lastSearchType.set(this.typeValue);
+
 
       const selectedType = this.types.find(t => t.value === this.typeValue);
       if (selectedType) {
@@ -68,15 +72,20 @@ export class ProductFilterComponent {
       const sort = queryParams['sort'];
       const isValidSort = validSortValues.includes(sort);
 
+      let sortValue;
       if (!isValidSort) {
         delete queryParams['sort'];
-        this.onSortChange(SortOption.STANDARD);
+        sortValue = SortOption.STANDARD;
       } else {
-        this.onSortChange(sort);
+        sortValue = sort;
       }
+      this.onSortChange(sortValue);
+      this.historyService.lastSortOption.set(sortValue);
+
 
       // Update search text
       this.searchText = queryParams['search'] || '';
+      this.historyService.lastSearchText.set(this.searchText);
 
       this.router.navigate([], {
         relativeTo: this.route,
